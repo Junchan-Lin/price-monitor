@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head><meta charset="utf-8"><title>{{ shop_name }}｜全新改版</title>
+<style>
+body { font-family: sans-serif; margin: 2rem; background: #111; color: #eee; }
+.tile { border: 1px solid #444; padding: 1rem; margin-bottom: 1rem; max-width: 480px; }
+</style></head>
+<body>
+<h1>{{ shop_name }} 全新改版！</h1>
+{% for item in items %}
+  <section class="tile" data-product="{{ item.sku }}">
+    <div class="tile__title">{{ item.name }}</div>
+    <div class="tile__cost">{{ item.price }} TWD</div>
+    <div class="tile__inventory">{{ item.stock }}</div>
+  </section>
+{% endfor %}
+</body>
+</html>

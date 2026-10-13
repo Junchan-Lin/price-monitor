@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head><meta charset="utf-8"><title>{{ item.name }}｜{{ shop_name }}</title>
+<style>
+body { font-family: serif; margin: 2rem; background: #f3faf4; }
+.product { background: #fff; padding: 1.5rem; max-width: 480px; border-left: 6px solid #2b8a3e; }
+.price { font-size: 1.6rem; color: #2b8a3e; }
+</style></head>
+<body>
+<p><a href="/">← {{ shop_name }}</a></p>
+<article class="product" itemscope itemtype="https://schema.org/Product">
+  <h1 itemprop="name">{{ item.name }}</h1>
+  <div itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+    <meta itemprop="price" content="{{ item.price }}">
+    <meta itemprop="priceCurrency" content="TWD">
+    <p class="price">特價 {{ "{:,}".format(item.price) }} 元</p>
+  </div>
+  {% if item.stock > 0 %}
+  <p id="qty">庫存：{{ item.stock }}</p>
+  {% else %}
+  <p id="qty">暫時缺貨</p>
+  {% endif %}
+</article>
+</body>
+</html>

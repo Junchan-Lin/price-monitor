@@ -1,0 +1,43 @@
+services:
+  mock-shops:
+    build: .
+    image: price-monitor
+    command: uvicorn mock_shops.app:app --host 0.0.0.0 --port 8001
+    ports:
+      - "8001:8001"
+    environment:
+      MOCK_CHANGE_INTERVAL_SECONDS: ${MOCK_CHANGE_INTERVAL_SECONDS:-180}
+    networks:
+      default:
+        # 讓 monitor 容器與本機瀏覽器都能用同一組網址連到三家商城
+        aliases:
+          - shop-a.localhost
+          - shop-b.localhost
+          - shop-c.localhost
+
+  monitor:
+    build: .
+    image: price-monitor
+    command: uvicorn --factory monitor.web.app:create_app --host 0.0.0.0 --port 8000
+    ports:
+      - "8000:8000"
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      SCRAPE_INTERVAL_MINUTES: ${SCRAPE_INTERVAL_MINUTES:-10}
+      DATABASE_URL: sqlite:////data/monitor.db
+      SEED_URLS: >-
+        http://shop-a.localhost:8001/products#P001,
+        http://shop-b.localhost:8001/products#P001,
+        http://shop-c.localhost:8001/item/P001,
+        http://shop-a.localhost:8001/products#P004,
+        http://shop-b.localhost:8001/products#P006,
+        http://shop-c.localhost:8001/item/P002
+    volumes:
+      - monitor-data:/data
+    depends_on:
+      - mock-shops
+
+volumes:
+  monitor-data:

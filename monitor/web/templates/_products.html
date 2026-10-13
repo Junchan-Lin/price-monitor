@@ -1,0 +1,31 @@
+<div id="products" hx-get="/partials/products" hx-trigger="every 15s" hx-swap="outerHTML">
+  {% if error %}<p class="error">{{ error }}</p>{% endif %}
+  <table>
+    <thead>
+      <tr><th>商品</th><th>商城</th><th>目前價格</th><th>庫存</th><th>降價門檻</th><th>最後檢查</th><th>狀態</th><th></th></tr>
+    </thead>
+    <tbody>
+    {% for p in products %}
+      {% set snap = latest.get(p.id) %}
+      <tr class="{{ 'row-error' if p.status in ('network_error', 'parse_error') }}">
+        <td><a href="/products/{{ p.id }}">{{ p.name or p.url }}</a></td>
+        <td>{{ ADAPTERS[p.shop].display_name if p.shop in ADAPTERS else p.shop }}</td>
+        <td>{{ snap.price | money if snap else "—" }}</td>
+        <td>{% if snap %}{{ snap.stock if snap.stock > 0 else "缺貨" }}{% else %}—{% endif %}</td>
+        <td>{{ p.threshold_pct | round(1) }}%</td>
+        <td>{{ p.last_checked_at | localtime }}</td>
+        <td title="{{ p.last_error or '' }}">
+          {{ STATUS_LABELS.get(p.status, p.status) }}
+          {% if p.consecutive_failures %}<span class="muted">（連續失敗 {{ p.consecutive_failures }}）</span>{% endif %}
+        </td>
+        <td>
+          <button class="link" hx-post="/products/{{ p.id }}/delete" hx-target="#products"
+                  hx-swap="outerHTML" hx-confirm="確定停止監控這個商品？">刪除</button>
+        </td>
+      </tr>
+    {% else %}
+      <tr><td colspan="8" class="muted">尚未加入監控商品</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>

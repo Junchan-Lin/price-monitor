@@ -1,0 +1,26 @@
+<table>
+  <thead><tr><th>時間</th><th>商品</th><th>事件</th><th>變化</th><th>通知</th></tr></thead>
+  <tbody>
+  {% for e in events %}
+    <tr>
+      <td>{{ e.created_at | localtime }}</td>
+      <td><a href="/products/{{ e.product_id }}">{{ e.product.name or e.product.url }}</a></td>
+      <td><span class="tag tag-{{ e.type }}">{{ EVENT_LABELS[e.type] }}</span></td>
+      <td>
+        {% if e.type in ("price_drop", "price_rise") %}
+          {{ e.old_value | int | money }} → {{ e.new_value | int | money }}
+        {% elif e.type in ("out_of_stock", "restock") %}
+          庫存 {{ e.old_value }} → {{ e.new_value }}
+        {% elif e.type == "monitor_error" %}
+          <span class="muted">{{ e.new_value }}</span>
+        {% endif %}
+      </td>
+      <td>
+        {% if e.notified_at %}✅{% else %}<span class="bad" title="{% for d in e.deliveries if not d.success %}{{ d.channel }}: {{ d.error }} {% endfor %}">待重送</span>{% endif %}
+      </td>
+    </tr>
+  {% else %}
+    <tr><td colspan="5" class="muted">尚無事件</td></tr>
+  {% endfor %}
+  </tbody>
+</table>

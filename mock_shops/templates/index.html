@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head><meta charset="utf-8"><title>模擬競品商城</title>
+<style>
+body { font-family: sans-serif; margin: 2rem; max-width: 760px; }
+form { display: inline; }
+td, th { padding: .3rem .8rem; text-align: left; }
+</style></head>
+<body>
+<h1>模擬競品商城</h1>
+<p>三家商城共用同一份商品資料，但 HTML 結構各不相同，價格與庫存會定時隨機變動。</p>
+<table>
+  <tr><th>商城</th><th>網址</th><th>結構</th><th>改版模式</th></tr>
+  {% for key, name in shops.items() %}
+  {% set url = "http://" ~ key ~ ".localhost" ~ (":" ~ port if port else "") ~ "/" %}
+  <tr>
+    <td>{{ name }}</td>
+    <td><a href="{{ url }}">{{ url }}</a></td>
+    <td>{{ {"shop-a": "表格列表", "shop-b": "卡片網格", "shop-c": "商品詳細頁"}[key] }}</td>
+    <td>
+      <form method="post" action="/admin/redesign/{{ key }}?enabled={{ 'false' if state.redesigned[key] else 'true' }}">
+        <button>{{ "已改版（點此還原）" if state.redesigned[key] else "模擬改版" }}</button>
+      </form>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+<h2>手動觸發</h2>
+<form method="post" action="/admin/mutate"><button>立即隨機變動價格與庫存</button></form>
+</body>
+</html>

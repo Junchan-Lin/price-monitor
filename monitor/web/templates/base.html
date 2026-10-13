@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}競品價格監控{% endblock %}</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <header>
+    <a class="brand" href="/">📊 競品價格監控</a>
+    <nav><a href="/">監控商品</a><a href="/events">事件紀錄</a></nav>
+  </header>
+  <main>{% block content %}{% endblock %}</main>
+  <footer>Code Sky 逅斯蓋工作室</footer>
+</body>
+</html>

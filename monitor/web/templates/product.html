@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}{{ product.name or product.url }}｜競品價格監控{% endblock %}
+{% block head %}<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>{% endblock %}
+{% block content %}
+<p><a href="/">← 回到監控商品</a></p>
+<h2>{{ product.name or "（尚未取得名稱）" }}</h2>
+<dl class="meta">
+  <dt>商城</dt><dd>{{ ADAPTERS[product.shop].display_name if product.shop in ADAPTERS else product.shop }}</dd>
+  <dt>網址</dt><dd><a href="{{ product.url }}" target="_blank" rel="noopener">{{ product.url }}</a></dd>
+  <dt>目前價格</dt><dd>{{ latest.price | money if latest else "—" }}</dd>
+  <dt>庫存</dt><dd>{{ latest.stock if latest else "—" }}</dd>
+  <dt>降價門檻</dt><dd>{{ product.threshold_pct | round(1) }}%</dd>
+  <dt>狀態</dt><dd class="{{ 'bad' if product.status in ('network_error', 'parse_error') }}">
+    {{ STATUS_LABELS.get(product.status, product.status) }}{% if product.last_error %}：{{ product.last_error }}{% endif %}
+  </dd>
+</dl>
+
+<h3>價格走勢</h3>
+{% if chart.prices %}
+<div class="chart"><canvas id="price-chart"></canvas></div>
+<script>
+  const chart = {{ chart | tojson }};
+  new Chart(document.getElementById("price-chart"), {
+    type: "line",
+    data: {
+      labels: chart.labels,
+      datasets: [
+        { label: "價格 (NT$)", data: chart.prices, stepped: true, borderColor: "#2563eb", yAxisID: "y" },
+        { label: "庫存", data: chart.stocks, stepped: true, borderColor: "#9ca3af", borderDash: [4, 4], yAxisID: "y1" },
+      ],
+    },
+    options: {
+      maintainAspectRatio: false,
+      interaction: { mode: "index", intersect: false },
+      scales: { y: { position: "left" }, y1: { position: "right", grid: { drawOnChartArea: false }, beginAtZero: true } },
+    },
+  });
+</script>
+{% else %}
+<p class="muted">尚無快照資料。</p>
+{% endif %}
+
+<h3>事件</h3>
+{% include "_events.html" %}
+{% endblock %}

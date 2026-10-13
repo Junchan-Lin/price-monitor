@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head><meta charset="utf-8"><title>{{ shop_name }}｜全館商品</title>
+<style>
+body { font-family: sans-serif; margin: 2rem; background: #f4f6fb; }
+h1 { color: #1f3c88; }
+table { border-collapse: collapse; background: #fff; width: 100%; max-width: 720px; }
+th, td { border: 1px solid #ccd; padding: .5rem .8rem; text-align: left; }
+th { background: #1f3c88; color: #fff; }
+.soldout { color: #c00; }
+</style></head>
+<body>
+<h1>{{ shop_name }}</h1>
+<table class="price-table">
+  <thead><tr><th>編號</th><th>商品名稱</th><th>售價</th><th>庫存</th></tr></thead>
+  <tbody>
+  {% for item in items %}
+    <tr id="{{ item.sku }}">
+      <td class="sku">{{ item.sku }}</td>
+      <td class="name">{{ item.name }}</td>
+      <td class="price">NT${{ "{:,}".format(item.price) }}</td>
+      {% if item.stock > 0 %}
+      <td class="stock">{{ item.stock }}</td>
+      {% else %}
+      <td class="stock soldout">缺貨</td>
+      {% endif %}
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</body>
+</html>

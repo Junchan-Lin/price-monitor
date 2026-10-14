@@ -15,4 +15,22 @@
   <h2>最近事件 <a class="small" href="/events">全部 →</a></h2>
   {% include "_events.html" %}
 </section>
+<section class="help">
+  <h2>支援的網站</h2>
+  <p>在上方輸入框貼上商品網址，按「加入監控」即可。</p>
+  <ul>
+    <li>
+      <strong>PChome 24h（真實網站）</strong>：貼上商品頁網址，例如
+      <code>https://24h.pchome.com.tw/prod/DYAJCH-1900JLHPE</code>。
+      名稱與價格會在下一輪檢查後出現；真實商品的價格不常變動，建議保持預設的 10 分鐘檢查間隔。
+    </li>
+    <li>
+      <strong>模擬競品商城</strong>：
+      <code>http://shop-a.localhost:8001/products#P001</code>、
+      <code>http://shop-b.localhost:8001/products#P001</code>、
+      <code>http://shop-c.localhost:8001/item/P001</code>（商品編號 P001 至 P006）。
+      想立刻看到降價或缺貨通知，可以到 <a href="http://localhost:8001" target="_blank" rel="noopener">模擬商城</a> 手動觸發價格變動。
+    </li>
+  </ul>
+</section>
 {% endblock %}

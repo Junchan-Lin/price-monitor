@@ -30,3 +30,7 @@ dl.meta { display: grid; grid-template-columns: 6rem 1fr; gap: .4rem 1rem; }
 dl.meta dt { color: var(--muted); }
 dl.meta dd { margin: 0; }
 .chart { position: relative; height: 320px; background: #fff; border: 1px solid var(--line); padding: 1rem; }
+.help { background: #fff; border: 1px solid var(--line); padding: 1rem 1.5rem; font-size: .92rem; }
+.help h2 { font-size: 1.05rem; margin-top: 0; }
+.help li { margin-bottom: .5rem; line-height: 1.6; }
+code { background: #f3f4f6; padding: .1rem .35rem; border-radius: 4px; font-size: .85rem; }

@@ -4,6 +4,10 @@ from monitor.models import Event
 from monitor.scrapers import ADAPTERS
 
 
+class NotifyError(Exception):
+    """送出失敗；訊息不含網址（Telegram 的網址帶有 bot token）。"""
+
+
 class Notifier(Protocol):
     """通知管道：送出事件，失敗時拋出例外。"""
 

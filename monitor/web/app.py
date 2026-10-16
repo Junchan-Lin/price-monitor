@@ -19,6 +19,8 @@ from monitor.scrapers import ADAPTERS, UnsupportedSiteError, get_adapter
 from monitor.scrapers.fetch import Fetcher, make_client
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+# httpx 的 INFO 日誌會記下完整網址，其中含 Telegram bot token
+logging.getLogger("httpx").setLevel(logging.WARNING)
 
 HERE = Path(__file__).parent
 DISPLAY_TZ = ZoneInfo("Asia/Taipei")

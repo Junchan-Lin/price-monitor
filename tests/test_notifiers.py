@@ -1,4 +1,5 @@
 import json
+import logging
 
 import httpx
 import respx
@@ -105,3 +106,46 @@ async def test_notified_events_are_not_resent(session_factory):
         await dispatch_pending(session, [fake])
         assert len(fake.sent) == 1
         assert session.scalars(select(Event)).one().notified_at is not None
+
+
+@respx.mock
+async def test_telegram_error_does_not_leak_bot_token(session_factory):
+    respx.post("https://api.telegram.org/botSECRET123/sendMessage").mock(
+        return_value=httpx.Response(401)
+    )
+    async with httpx.AsyncClient() as client:
+        with session_factory() as session:
+            event = make_event(session)
+            await dispatch_pending(session, [TelegramNotifier(client, "SECRET123", "42")])
+            (delivery,) = event.deliveries
+            assert delivery.success is False
+            assert "SECRET123" not in delivery.error
+            assert "401" in delivery.error
+            assert event.notified_at is None
+
+
+@respx.mock
+async def test_line_error_reports_status_code(session_factory):
+    respx.post(LINE_URL).mock(return_value=httpx.Response(401))
+    async with httpx.AsyncClient() as client:
+        with session_factory() as session:
+            event = make_event(session)
+            await dispatch_pending(session, [LineNotifier(client, "SECRET", "U123")])
+            (delivery,) = event.deliveries
+            assert delivery.success is False
+            assert "401" in delivery.error
+            assert "SECRET" not in delivery.error
+
+
+@respx.mock
+async def test_app_logging_does_not_leak_bot_token(session_factory, caplog):
+    import monitor.web.app  # noqa: F401  載入時會設定日誌
+
+    respx.post("https://api.telegram.org/botSECRET-TOKEN/sendMessage").mock(
+        return_value=httpx.Response(200, json={"ok": True})
+    )
+    with caplog.at_level(logging.INFO), session_factory() as session:
+        event = make_event(session)
+        async with httpx.AsyncClient() as client:
+            await TelegramNotifier(client, "SECRET-TOKEN", "42").send(event)
+    assert "SECRET-TOKEN" not in caplog.text

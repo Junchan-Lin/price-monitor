@@ -20,7 +20,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **PChome**：商品頁 HTML 會擋非瀏覽器的請求（回 429），所以改用 API。售價取 `Price.P`；`ButtonType != "ForSale"`（缺貨時是 `OrderRefill`）時庫存視為 0。這些是沒有公開文件的內部 API，格式改變時應該產生 ParseError，不可以默默回傳錯誤值。
 - **一輪排程**（`monitor/scheduler.py:run_cycle`）：逐一處理商品並逐一 commit → `adapter.scrape`（內部透過 `Fetcher.get`：重試 3 次、間隔遞增、同一 host 間隔 1 秒）→ 存 Snapshot → `detector.detect` → Event → `notifiers.dispatch_pending`。
 - **錯誤分類**：`FetchError` 對應 `network_error`，`ParseError` 對應 `parse_error`（網站可能改版）。
-- **通知**：Notifier 是 Protocol（`name` + `async send(event)`，失敗時拋出例外）。`EventDelivery` 在每個事件、每個管道各有一筆，已成功的管道不會重送；所有管道都成功才設定 `Event.notified_at`。沒有設定 Telegram 與 LINE 時，改用 ConsoleNotifier。
+- **通知**：Notifier 是 Protocol（`name` + `async send(event)`，失敗時拋出例外；HTTP 失敗一律轉成 `NotifyError`，訊息與日誌都不含網址，因為 Telegram 網址帶有 bot token）。`EventDelivery` 在每個事件、每個管道各有一筆，已成功的管道不會重送；所有管道都成功才設定 `Event.notified_at`。沒有設定 Telegram 與 LINE 時，改用 ConsoleNotifier。
 - **web**：`create_app(settings, start_scheduler=...)` 是 factory。HTMX 請求（`HX-Request` header）回傳 `_products.html` 片段，其他請求回傳 303 redirect。資料庫是空的時，會依 `SEED_URLS` 建立預設的監控商品。
 - 時間以 naive UTC 存入資料庫，顯示時透過 `localtime` filter 轉成 Asia/Taipei。
 

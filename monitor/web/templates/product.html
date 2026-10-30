@@ -32,7 +32,12 @@
     options: {
       maintainAspectRatio: false,
       interaction: { mode: "index", intersect: false },
-      scales: { y: { position: "left" }, y1: { position: "right", grid: { drawOnChartArea: false }, beginAtZero: true } },
+      scales: {
+        // 快照很多時只顯示部分時間標籤，並省略秒數；滑鼠移上去仍看得到完整時間
+        x: { ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 8, callback(value) { return this.getLabelForValue(value).slice(0, 11); } } },
+        y: { position: "left" },
+        y1: { position: "right", grid: { drawOnChartArea: false }, beginAtZero: true },
+      },
     },
   });
 </script>

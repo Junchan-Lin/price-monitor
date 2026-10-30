@@ -2,7 +2,7 @@
 {% block content %}
 <section>
   <h2>監控商品</h2>
-  <p class="muted">每 {{ interval | round(1) }} 分鐘自動檢查一次；本頁每 15 秒自動更新。</p>
+  <p class="muted">每 {{ "%g" | format(interval | round(1)) }} 分鐘自動檢查一次；本頁每 15 秒自動更新。</p>
   <form class="add" hx-post="/products" hx-target="#products" hx-swap="outerHTML"
         hx-on::after-request="if (event.detail.successful) this.reset()">
     <input name="url" type="url" required placeholder="商品網址，例如 http://shop-a.localhost:8001/products#P001">
